@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # मैन्युअल रूप से बिल्ड ट्रिगर करने के लिए
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Target Repository (ankurCES/project_mythara) को चेकआउट करना
+      # 1. Target Repository को चेकआउट करना
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
@@ -29,8 +29,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 4. Debug APK बिल्ड करना
+      # 4. Debug APK बिल्ड करना (यहाँ GITHUB_TOKEN जोड़ा गया है)
       - name: Build Debug APK
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew :app:assembleDebug
 
       # 5. जनरेट हुए APK को Artifact के रूप में अपलोड करना
