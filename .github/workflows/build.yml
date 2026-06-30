@@ -1,0 +1,39 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main  # अगर आपकी डिफ़ॉल्ट ब्रांच 'master' है, तो इसे 'master' कर लें
+  workflow_dispatch: # इसकी मदद से आप GitHub पर मैन्युअल रूप से भी बिल्ड ट्रिगर कर सकते हैं
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. कोड को चेकआउट करना
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Java Environment (JDK) सेट अप करना (Android प्रोजेक्ट्स के लिए Java 17 सामान्यतः सही रहता है)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      # 3. Gradle wrapper को एग्जीक्यूटेबल परमिशन देना
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 4. Debug APK बिल्ड करना
+      - name: Build Debug APK
+        run: ./gradlew :app:assembleDebug
+
+      # 5. जनरेट हुए APK को Artifact के रूप में अपलोड करना
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
